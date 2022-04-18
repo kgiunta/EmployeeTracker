@@ -1,5 +1,18 @@
 const inquirer = require("inquirer");
 const fs = require("fs");
+const departmentArr = [];
+
+// const db = mysql.createConnection(
+//     {
+//       host: 'localhost',
+//       // MySQL username,
+//       user: 'root',
+//       // MySQL password
+//       password: '',
+//       database: 'classlist_db'
+//     },
+//     console.log(`Connected to the classlist_db database.`)
+//   );
 
 function getInfo() {
   inquirer.prompt([
@@ -14,7 +27,7 @@ function getInfo() {
         "View All Roles",
         "Add Role",
         "View All Departments",
-        "Add Department ",
+        "Add Department",
         "Quit",
       ],
     },
@@ -139,5 +152,28 @@ function getInfo() {
       },
     },
   ]);
+  //   .then(data)
+  //   let depart;
+  //       switch (data.role) {
+  //         case "What is the name of the department?":
+  //             teamMember = new Manager(
+  //               data.departmentAdd
+  //             );
+  //             managerArr.push(teamMember);
+  //             break
+  //   ;
 }
 getInfo();
+
+// function switchcase(){
+// inquirer.prompt().then(data)=>{
+//     switch(choices){
+//         case"View All Employees":
+//         showemployees();
+//     }break;
+//     case "View All Roles":
+//         showRoles();
+// }break;
+// case "View All Departments":
+//     showDepartments();
+//     break;

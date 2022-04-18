@@ -6,47 +6,45 @@ USE employee_db;
 CREATE TABLE department (
 Departmentid INT NOT NULL  PRIMARY KEY,
 departmentName VARCHAR(30)
-)
+);
 
-CREATE TABLE title(
-Titleid INT PRIMARY KEY,
+CREATE TABLE roles(
+id INT PRIMARY KEY,
 title VARCHAR(30) NOT NULL,
 salary DECIMAL,
-department_id: INT
-FOREIGN KEY (Departmentid)
-  REFERENCES department(Departmentid)
-)
+department_id INT
+);
 
-CREATE TABLE employee(
+CREATE TABLE employees(
 id INT PRIMARY KEY AUTO_INCREMENT,
 first_name VARCHAR(30) NOT NULL,
 last_name VARCHAR(30) NOT NULL,
-title_id: INT,
-manager_id: INT 
-)
+role_id INT,
+manager_id INT 
+);
 
 
 
 INSERT INTO department (Departmentid, departmentName)
-VALUES ( 1, "Sales")
-       ( 1, "Sales"),
-       ( 2 "Engineering"),
-       ( 2,"Engineering");
+VALUES ( 1, "Sales"),
+       ( 2, "Engineering"),
+       ( 3, "Finance"),
+       ( 4,"Legal");
 
 
 
 
-INSERT INTO title (Titleid, title, salary, department_id)
+INSERT INTO roles (id, title, salary, department_id)
 VALUES ( 10, "Sales Lead", 150000,1),
-       ( 11, "Salesperson", 80000,1),
-       ( 12, "Lead Engineer", 150000,2),
-       (13, "Software Engineer", 110000, 2);
+       ( 11, "Lead Engineer", 130000,2),
+       ( 12, "Account Manager", 200000,3),
+       (13, "Legal Team Lead", 300000, 4);
 
 
 
 
-INSERT INTO employees (first_name, last_name, title_id, manager_id)
-VALUES ( "John", "Doe", "Sales Lead", "Sales","no"),
-       ( "Mike", "Chan", "Salesperson", "Sales","no"),
-       ( "Ashley", "Rodriguez", "Lead Engineer", "Engineering","no"),
-       ("Kevin", "Tupik", "Software Engineer", "Engineering", "no");
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+VALUES ("John", "Doe", 10, 1),
+        ("Mike", "Chan", 11, 2),
+       ("Ashley", "Rodriguez", 12, 4),
+       ("Kevin", "Tupik", 13, 5);
