@@ -4,7 +4,7 @@ const mysql = require("mysql2");
 const express = require("express");
 const res = require("express/lib/response");
 const { ifError } = require("assert");
-
+const cTable = require("console.table");
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -40,10 +40,10 @@ function init() {
         ],
       },
     ])
-    //   need help setting up
+
     .then((data) => {
       if (data.action === "View All Employees") {
-        viewAllEmployees;
+        viewAllEmployees();
       } else if (data.action === "Add Employee") {
         addEmployee();
       } else if (data.action === "Update Employee Role") {
@@ -85,8 +85,6 @@ function selectManager() {
   );
   return managersArr;
 }
-
-// OFFICE HOURS HELLPPPPPPPPPP
 
 function addEmployee() {
   db.query("SELECT * FROM employees", function (err, data) {
@@ -130,16 +128,11 @@ function addEmployee() {
         },
       ])
       .then(function (val) {
-        // var roleId = selectRole().indexOf(val.role) + 1;
+        var roleId = selectRole().indexOf(val.role) + 1;
         var managerId = selectManager().indexOf(val.manager) + 1;
         db.query(
-          "INSERT INTO employees SET ?",
-          {
-            first_name: val.firstName,
-            last_name: val.lastName,
-            manager_id: managerId,
-            // role_id: roleId,
-          },
+          "INSERT INTO employees (first_name,last_name,role_id,manager_id) VALUES (?,?,?,?)",
+          [val.firstName, val.lastName, managerId, roleId],
           function (err) {
             if (err) throw err;
             console.table(val);
@@ -149,11 +142,11 @@ function addEmployee() {
       });
   });
 }
-/// OFFICE HOURS HELLPPPPPPPPPP
+
 // view employees
 function viewAllEmployees() {
   db.query(
-    "SELECT * FROM employees INNER JOIN roles on roles.id = employees.role_id INNER JOIN department on department.id = roles.department_id left join employees on employees.manager_id = employees.id;",
+    "SELECT * FROM employees INNER JOIN roles on roles.id = employees.role_id INNER JOIN department on department.id = roles.department_id;",
     function (err, res) {
       if (err) throw err;
       console.table(res);
@@ -164,14 +157,11 @@ function viewAllEmployees() {
 
 // view roles
 function viewAllRoles() {
-  db.query(
-    "SELECT employees.first_name, employees.last_name, roles.title AS Title FROM employees JOIN roles ON employees.role_id = roles.id;",
-    function (err, res) {
-      if (err) throw err;
-      console.table(res);
-      init();
-    }
-  );
+  db.query("SELECT roles.title FROM roles;", function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    init();
+  });
 }
 // viewAllDepartments
 function viewAllDepartments() {
@@ -191,7 +181,6 @@ function updateRole() {
   ]);
 }
 
-// HELP
 function addDepartment() {
   inquirer
     .prompt([
@@ -254,37 +243,3 @@ function addingRole() {
     });
 }
 init();
-//     {
-//       type: "input",
-//       message: "quit function here",
-//       name: "quit",
-//       when: (response) => {
-//         if (response.action === "Quit") return true;
-//       },
-//     },
-//   ]);
-//   //   .then(data)
-//   //   let depart;
-//   //       switch (data.role) {
-//   //         case "What is the name of the department?":
-//   //             teamMember = new Manager(
-//   //               data.departmentAdd
-//   //             );
-//   //             managerArr.push(teamMember);
-//   //             break
-//   //   ;
-// }
-// getInfo();
-
-// // function switchcase(){
-// // inquirer.prompt().then(data)=>{
-// //     switch(choices){
-// //         case"View All Employees":
-// //         showemployees(); which would be a db.query, make sure you use group by in sql lesson 23
-// //     }break;
-// //     case "View All Roles":
-// //         showRoles();
-// // }break;
-// // case "View All Departments":
-// //     showDepartments();
-// //     break;
