@@ -2,6 +2,8 @@ const inquirer = require("inquirer");
 const fs = require("fs");
 const mysql = require("mysql2");
 const express = require("express");
+const res = require("express/lib/response");
+const { ifError } = require("assert");
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -41,7 +43,7 @@ function init() {
     //   need help setting up
     .then((data) => {
       if (data.action === "View All Employees") {
-        console.log(data);
+        viewAllEmployees;
       } else if (data.action === "Add Employee") {
         addEmployee();
       } else if (data.action === "Update Employee Role") {
@@ -62,7 +64,7 @@ function init() {
 
 var rolesArr = [];
 function selectRole() {
-  connection.query("SELECT * FROM roles", function (err, res) {
+  db.query("SELECT * FROM roles", function (err, res) {
     if (err) throw err;
     for (var i = 0; i < res.length; i++) {
       rolesArr.push(res[i].title);
@@ -70,6 +72,21 @@ function selectRole() {
   });
   return rolesArr;
 }
+var managersArr = [];
+function selectManager() {
+  db.query(
+    "SELECT first_name, last_name FROM employees WHERE manager_id IS NULL",
+    function (err, res) {
+      if (err) throw err;
+      for (var i = 0; i < res.length; i++) {
+        managersArr.push(res[i].first_name);
+      }
+    }
+  );
+  return managersArr;
+}
+
+// OFFICE HOURS HELLPPPPPPPPPP
 
 function addEmployee() {
   db.query("SELECT * FROM employees", function (err, data) {
@@ -113,15 +130,15 @@ function addEmployee() {
         },
       ])
       .then(function (val) {
-        var roleId = selectRole().indexOf(val.role) + 1;
-        var managerId = selectManager().indexOf(val.choice) + 1;
+        // var roleId = selectRole().indexOf(val.role) + 1;
+        var managerId = selectManager().indexOf(val.manager) + 1;
         db.query(
-          "INSERT INTO employee SET ?",
+          "INSERT INTO employees SET ?",
           {
             first_name: val.firstName,
             last_name: val.lastName,
             manager_id: managerId,
-            role_id: roleId,
+            // role_id: roleId,
           },
           function (err) {
             if (err) throw err;
@@ -132,10 +149,11 @@ function addEmployee() {
       });
   });
 }
+/// OFFICE HOURS HELLPPPPPPPPPP
 // view employees
 function viewAllEmployees() {
   db.query(
-    "SELECT employees.first_name, employees.last_name, roles.title, roles.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;",
+    "SELECT * FROM employees INNER JOIN roles on roles.id = employees.role_id INNER JOIN department on department.id = roles.department_id left join employees on employees.manager_id = employees.id;",
     function (err, res) {
       if (err) throw err;
       console.table(res);
@@ -147,7 +165,7 @@ function viewAllEmployees() {
 // view roles
 function viewAllRoles() {
   db.query(
-    "SELECT employees.first_name, employees.last_name, roles.title AS Title FROM employee JOIN role ON employee.role_id = roles.id;",
+    "SELECT employees.first_name, employees.last_name, roles.title AS Title FROM employees JOIN roles ON employees.role_id = roles.id;",
     function (err, res) {
       if (err) throw err;
       console.table(res);
@@ -157,14 +175,11 @@ function viewAllRoles() {
 }
 // viewAllDepartments
 function viewAllDepartments() {
-  db.query(
-    "SELECT employees.first_name, employees.last_name, department.name AS Department FROM employees JOIN role ON employees.role_id = role.id JOIN department ON roles.department_id = department.id ORDER BY employee.id;",
-    function (err, res) {
-      if (err) throw err;
-      console.table(res);
-      init();
-    }
-  );
+  db.query("SELECT * FROM department AS Department ", function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    init();
+  });
 }
 function updateRole() {
   inquirer.prompt([
@@ -182,12 +197,14 @@ function addDepartment() {
       message: "What is the name of the department?",
       name: "departmentAdd",
     },
-    {
-      type: "input",
-      message: "What is the name of the department?",
-      name: "departmentAdd",
-    },
   ]);
+  // .then((answer)=> ) {
+  //    db.query( "INSERT INTO department ?",answer.departmentAdd),(err,res)=>{
+  //        if(err) throw (err)
+  //        init()
+  //    }
+
+  // },
 }
 function addingRole() {
   inquirer.prompt([
@@ -208,6 +225,20 @@ function addingRole() {
       choices: ["Engineering", "Finance", "Legal", "Sales", "Service"],
     },
   ]);
+  then(function (res) {
+    connection.query(
+      "INSERT INTO roles  ?",
+      {
+        title: res.roleAdd,
+        salary: res.roleSalary,
+      },
+      function (err) {
+        if (err) throw err;
+        console.table(res);
+        init();
+      }
+    );
+  });
 }
 init();
 //     {
