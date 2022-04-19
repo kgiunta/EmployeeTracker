@@ -190,55 +190,68 @@ function updateRole() {
     },
   ]);
 }
-function addDepartment() {
-  inquirer.prompt([
-    {
-      type: "input",
-      message: "What is the name of the department?",
-      name: "departmentAdd",
-    },
-  ]);
-  // .then((answer)=> ) {
-  //    db.query( "INSERT INTO department ?",answer.departmentAdd),(err,res)=>{
-  //        if(err) throw (err)
-  //        init()
-  //    }
 
-  // },
+// HELP
+function addDepartment() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "What is the name of the department?",
+        name: "departmentAdd",
+      },
+    ])
+    .then((answer) => {
+      db.query(
+        "INSERT INTO department (departmentName) VALUES (?)",
+        answer.departmentAdd,
+        (err, res) => {
+          if (err) throw err;
+          console.table(res);
+          init();
+        }
+      );
+    });
 }
 function addingRole() {
-  inquirer.prompt([
-    {
-      type: "input",
-      message: "What is the name of the role?",
-      name: "roleAdd",
-    },
-    {
-      type: "input",
-      message: "What is the salary of the role?",
-      name: "roleSalary",
-    },
-    {
-      type: "list",
-      message: "What department does the role belong to?",
-      name: "roleDepartment",
-      choices: ["Engineering", "Finance", "Legal", "Sales", "Service"],
-    },
-  ]);
-  then(function (res) {
-    connection.query(
-      "INSERT INTO roles  ?",
+  inquirer
+    .prompt([
       {
-        title: res.roleAdd,
-        salary: res.roleSalary,
+        type: "input",
+        message: "What is the name of the role?",
+        name: "roleAdd",
       },
-      function (err) {
-        if (err) throw err;
-        console.table(res);
-        init();
-      }
-    );
-  });
+      {
+        type: "input",
+        message: "What is the salary of the role?",
+        name: "roleSalary",
+      },
+      {
+        type: "list",
+        message: "What department does the role belong to?",
+        name: "roleDepartment",
+        choices: ["Engineering", "Finance", "Legal", "Sales", "Service"],
+      },
+    ])
+    .then(function (res) {
+      db.query(
+        "SELECT * FROM department where departmentName = (?)",
+        res.roleDepartment,
+        (err, resTwo) => {
+          if (err) throw err;
+          console.log(resTwo);
+          db.query(
+            "INSERT INTO roles (title,salary,department_id) VALUES (?,?,?)",
+            [res.roleAdd, res.roleSalary, resTwo.id],
+            function (err) {
+              if (err) throw err;
+              console.table(res);
+              init();
+            }
+          );
+        }
+      );
+    });
 }
 init();
 //     {
