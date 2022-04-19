@@ -18,9 +18,10 @@ Go into github and download my files, you can the npm install my package.json to
 
 ## Usage
 
-the video link below shows the application in use:
+the video link below shows the application in use:</br>
+https://youtu.be/6HQ7GxRCM04
 
-![alt text](assets/images/screenshot.png)
+![screenshot showing app in use](./assets/screenshot.png)
 
 ## License
 

@@ -85,7 +85,14 @@ function selectManager() {
   );
   return managersArr;
 }
-
+//
+//
+//
+//
+//
+//
+//
+// adding employee
 function addEmployee() {
   db.query("SELECT * FROM employees", function (err, data) {
     const employeeArray = data.map(
