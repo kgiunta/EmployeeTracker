@@ -5,6 +5,7 @@ const express = require("express");
 const res = require("express/lib/response");
 const { ifError } = require("assert");
 const cTable = require("console.table");
+const { info } = require("console");
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -85,13 +86,7 @@ function selectManager() {
   );
   return managersArr;
 }
-//
-//
-//
-//
-//
-//
-//
+
 // adding employee
 function addEmployee() {
   db.query("SELECT * FROM employees", function (err, data) {
@@ -178,18 +173,39 @@ function viewAllDepartments() {
     init();
   });
 }
-function updateRole() {
-  inquirer.prompt([
-    {
-      type: "input",
-      name: "roleUpdate",
-      message: "What is the employee's updated role?",
-    },
-  ]);
-}
+async function updateRole() {
+  db.query("SELECT * FROM employees ", function (err, data) {
+    const employeeArray = data.map(
+      (employees) => employees.first_name + " " + employees.last_name
+    );
+    db.query("SELECT * FROM roles ", function (err, dataTwo) {
+      const rolesArray = dataTwo.map((roles) => roles.title);
 
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "roleUpdate",
+            message: "Choose employee role to update",
+            choices: employeeArray,
+          },
+          {
+            type: "list",
+            name: "roleUpdateTwo",
+            message: "What is the employee's updated role?",
+            choices: rolesArray,
+          },
+        ])
+        .then((info) => {
+          console.log(info);
+          init();
+        });
+    });
+  });
+}
 function addDepartment() {
   inquirer
+
     .prompt([
       {
         type: "input",
