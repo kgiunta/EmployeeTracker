@@ -75,16 +75,15 @@ function selectRole() {
 }
 var managersArr = [];
 function selectManager() {
-  db.query(
-    "SELECT first_name, last_name FROM employees WHERE manager_id IS NULL",
-    function (err, res) {
-      if (err) throw err;
-      for (var i = 0; i < res.length; i++) {
-        managersArr.push(res[i].first_name);
-      }
+  db.query("SELECT first_name, last_name FROM employees", function (err, res) {
+    console.log(res);
+    if (err) throw err;
+    for (var i = 0; i < res.length; i++) {
+      managersArr.push(res[i].first_name);
     }
-  );
-  return managersArr;
+    console.log(managersArr);
+    //   return managersArr;
+  });
 }
 
 // adding employee
@@ -93,55 +92,49 @@ function addEmployee() {
     const employeeArray = data.map(
       (employees) => employees.first_name + " " + employees.last_name
     );
-
-    inquirer
-      .prompt([
-        {
-          type: "input",
-          name: "firstName",
-          message: "What is the employee's first name?",
-        },
-        {
-          type: "input",
-          name: "lastName",
-          message: "What is the employee's last name?",
-        },
-        {
-          type: "list",
-          name: "role",
-          message: "What is the employee's role",
-          choices: [
-            "Sales Lead",
-            "Salesperson",
-            "Lead Engineer",
-            "Software Engineer",
-            "Account Manager",
-            "Accountant",
-            "Legal Team Lead",
-            "Lawyer",
-            "Customer Service",
-          ],
-        },
-        {
-          type: "list",
-          name: "manager",
-          message: "Who is the employee's manager:",
-          choices: employeeArray,
-        },
-      ])
-      .then(function (val) {
-        var roleId = selectRole().indexOf(val.role) + 1;
-        var managerId = selectManager().indexOf(val.manager) + 1;
-        db.query(
-          "INSERT INTO employees (first_name,last_name,role_id,manager_id) VALUES (?,?,?,?)",
-          [val.firstName, val.lastName, managerId, roleId],
-          function (err) {
-            if (err) throw err;
-            console.table(val);
-            init();
-          }
-        );
-      });
+    db.query("SELECT * FROM roles", function (err, roles) {
+      const rolesArray = roles.map((roles) => roles.title);
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "firstName",
+            message: "What is the employee's first name?",
+          },
+          {
+            type: "input",
+            name: "lastName",
+            message: "What is the employee's last name?",
+          },
+          {
+            type: "list",
+            name: "role",
+            message: "What is the employee's role",
+            choices: rolesArray,
+          },
+          {
+            type: "list",
+            name: "manager",
+            message: "Who is the employee's manager:",
+            choices: employeeArray,
+          },
+        ])
+        .then(async function (val) {
+          var roleId = rolesArray.indexOf(val.role) + 1;
+          // selectManager();
+          var managerId = employeeArray.indexOf(val.manager) + 1;
+          console.log(roleId);
+          db.query(
+            "INSERT INTO employees (first_name,last_name,role_id,manager_id) VALUES (?,?,?,?)",
+            [val.firstName, val.lastName, roleId, managerId],
+            function (err) {
+              if (err) throw err;
+              console.table(val);
+              init();
+            }
+          );
+        });
+    });
   });
 }
 
